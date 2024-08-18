@@ -1,1 +1,1 @@
-"# Platformer-Boilerplate" 
+# Platformer-Boilerplate
