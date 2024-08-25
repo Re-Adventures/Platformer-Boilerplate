@@ -90,9 +90,7 @@ class Player {
 
             this.canJump = true;
         }
-        else {
-            this.canJump = false;
-        }
+
 
         // Collision with the platforms
         for (const platform of platforms) {
@@ -103,41 +101,41 @@ class Player {
                     && this.position.y + this.velocity.y + this.height
                         > platform.position.y) {
 
-                // Checking from which side it collided
 
-                // Distance from player's right edge to platform's left edge
-                let deltaLeft = this.position.x + this.width - platform.position.x;
-
-                // Distance from platform's right edge tp player's left edge
-                let deltaRight = platform.position.x + platform.width - this.position.x;
-
-                // Distance from player's bottom edge to platform's top edge
-                let deltaTop = this.position.y + this.height - platform.position.y;
-
-                // Distance from platform's bottom edge to player's top edge
-                let deltaBottom = platform.position.y + platform.width - this.position.y;
-
-                let minDelta = Math.min(deltaLeft, deltaRight, deltaBottom, deltaTop);
-
-                switch (minDelta) {
-                    case deltaLeft:
-                        // Colliding from left
+                // Calculate the overlap on both axes
+                let overlapX = (this.position.x + this.width) - platform.position.x;
+                if (this.position.x > platform.position.x) {
+                    overlapX = (platform.position.x + platform.width) - this.position.x;
+                }
+        
+                let overlapY = (this.position.y + this.height) - platform.position.y;
+                if (this.position.y > platform.position.y) {
+                    overlapY = (platform.position.y + platform.height) - this.position.y;
+                }
+        
+                // Determine the side of collision based on the smallest overlap
+                if (overlapX < overlapY) {
+                    if (this.position.x < platform.position.x) {
+                        // Collision from the left
                         this.position.x = platform.position.x - this.width;
-                        break;
-                    case deltaRight:
-                        // Colliding from right
+                    } else {
+                        // Collision from the right
                         this.position.x = platform.position.x + platform.width;
-                        break;
-                    case deltaTop:
+                    }
+                }
+                else {
+                    if (this.position.y < platform.position.y) {
+                        // Collision from the top
+                        this.position.y = platform.position.y - this.height;
                         this.velocity.y = 0;
                         this.canJump = true;
-                        this.position.y = platform.position.y - this.height;
-                        break;
-                    case deltaBottom:
-                        this.velocity.y = 0;
+                    } else {
+                        // Collision from the bottom
                         this.position.y = platform.position.y + platform.height;
-                        break;
+                        this.velocity.y = 0;
+                    }
                 }
+
 
             }
         }
@@ -179,6 +177,8 @@ class Player {
     }
     jump() {
         if (this.canJump) {
+            // Stop the player from jumping further
+            this.canJump = false;
             this.velocity.y = -this.jumpHeight;
         }
     }
